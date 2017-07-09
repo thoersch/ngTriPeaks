@@ -1,20 +1,37 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{title}}!!
-  </h1>
-  <img width="300" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxOS4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHZpZXdCb3g9IjAgMCAyNTAgMjUwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyNTAgMjUwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDojREQwMDMxO30NCgkuc3Qxe2ZpbGw6I0MzMDAyRjt9DQoJLnN0MntmaWxsOiNGRkZGRkY7fQ0KPC9zdHlsZT4NCjxnPg0KCTxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iMTI1LDMwIDEyNSwzMCAxMjUsMzAgMzEuOSw2My4yIDQ2LjEsMTg2LjMgMTI1LDIzMCAxMjUsMjMwIDEyNSwyMzAgMjAzLjksMTg2LjMgMjE4LjEsNjMuMiAJIi8+DQoJPHBvbHlnb24gY2xhc3M9InN0MSIgcG9pbnRzPSIxMjUsMzAgMTI1LDUyLjIgMTI1LDUyLjEgMTI1LDE1My40IDEyNSwxNTMuNCAxMjUsMjMwIDEyNSwyMzAgMjAzLjksMTg2LjMgMjE4LjEsNjMuMiAxMjUsMzAgCSIvPg0KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0xMjUsNTIuMUw2Ni44LDE4Mi42aDBoMjEuN2gwbDExLjctMjkuMmg0OS40bDExLjcsMjkuMmgwaDIxLjdoMEwxMjUsNTIuMUwxMjUsNTIuMUwxMjUsNTIuMUwxMjUsNTIuMQ0KCQlMMTI1LDUyLjF6IE0xNDIsMTM1LjRIMTA4bDE3LTQwLjlMMTQyLDEzNS40eiIvPg0KPC9nPg0KPC9zdmc+DQo=">
+<div id="title">
+  Tri-Peaks
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" href="http://angularjs.blogspot.ca/">Angular blog</a></h2>
-  </li>
-</ul>
+<div id="game-data">
+  <div id="score">⚐ {{game.score}}</div>
+  <div id="timer">◷ {{game.timer}}</div>
+  <button id="restart" *ngIf="game.isDeckEmpty() || game.timer == 0" (click)="restartGame()">☠ Restart ☠</button>
+  <button id="nextRound" *ngIf="game.roundComplete" (click)="nextRound()">➟ Next Round</button>
+  <div id="round"># {{game.round}}</div>
+  <div id="chain">☍ {{game.chain}}</div>
+</div>
+<div id="game-area">
+  <div id="peaks">
+    <div *ngFor="let peak of game.peaks; let i = index;" class="peak" id="peak-{{i}}">
+      <peak-row [peak]="peak | peakrow: 1" [peakIndex]="i" [row]="1" (onPickedCard)="pickedCard($event)"></peak-row>
+      <peak-row [peak]="peak | peakrow: 2" [peakIndex]="i" [row]="2" (onPickedCard)="pickedCard($event)"></peak-row>
+      <peak-row [peak]="peak | peakrow: 3" [peakIndex]="i" [row]="3" (onPickedCard)="pickedCard($event)"></peak-row>
+      <peak-row [peak]="peak | peakrow: 4" [peakIndex]="i" [row]="4" (onPickedCard)="pickedCard($event)"></peak-row>
+    </div>
+  </div>
+  <div id="deck">
+    <div *ngFor="let card of game.deck" (click)="drawFromDeck()" [ngClass]="{'black-suit': card.isBlackSuit(), 'red-suit': card.isRedSuit()}" class="card">
+      <div *ngIf="card.faceUp">
+        <span class="card-suit">{{card.suit}}</span>
+        <span class="card-value">{{card.value}}</span>
+      </div>
+      <div *ngIf="!card.faceUp">
+        <div class="card-face-down"></div>
+      </div>
+    </div>
+  </div>
 
+  <div id="active-card" [ngClass]="{'black-suit':game.activeCard.isBlackSuit(), 'red-suit': game.activeCard.isRedSuit()}" class="card">
+      <span class="card-suit">{{game.activeCard.suit}}</span>
+      <span class="card-value">{{game.activeCard.value}}</span>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<div class="row row-{{row}}">
+    <div *ngFor="let card of peak" (click)="pickCard(card)" [ngClass]="{'black-suit': card.isBlackSuit(), 'red-suit': card.isRedSuit(), 'card': !card.getRemoved()}">
+        <div *ngIf="!card.getRemoved()">
+            <div *ngIf="card.faceUp">
+                <span class="card-suit">{{card.suit}}</span>
+                <span class="card-value">{{card.value}}</span>
+            </div>
+            <div *ngIf="!card.faceUp">
+                <div class="card-face-down"></div>
+            </div>
+        </div>
+        <div *ngIf="card.getRemoved()">
+            <div class="removed-card"></div>
+        </div>
+    </div>
+</div>
